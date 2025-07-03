@@ -1,0 +1,19 @@
+{
+  "name": "scheduler",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "author": "Narasimha",
+  "license": "MIT",
+  "dependencies": {
+    "amqplib": "^0.10.8",
+    "dotenv": "^17.0.1",
+    "node-cron": "^4.2.0",
+    "winston": "^3.17.0"
+  },
+  "devDependencies": {
+    "@types/amqplib": "^0.10.7",
+    "@types/node": "^24.0.10",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.3"
+  }
+}

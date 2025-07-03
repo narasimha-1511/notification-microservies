@@ -7,7 +7,6 @@ import { getEnv } from "./config/env";
 import jwt from "jsonwebtoken";
 import { Schema } from "./graphql/index";
 import compression from "compression";
-import morgan from "morgan";
 
 const app = express();
 app.use(cors());
@@ -35,21 +34,21 @@ async function startGraphQlServer( app: express.Application ){
     await server.start();
     
     app.use('/graphql', expressMiddleware(server, {
-        context: async ({ req }: { req: express.Request }) : Promise<{ user: { userId: string, email: string } | null }> => {
+        context: async ({ req }: { req: express.Request }) : Promise<{ user: { userId: string, email: string } | null , headers: any }> => {
             const token = req.headers["authorization"]?.split(" ")[1];
 
             if(!token){
-                return { user: null };
+                return { user: null , headers: req.headers };
             }
             try{
                 const decoded = await jwt.verify(token, getEnv('JWT_SECRET')) as {
                     userId: string,
                     email: string
                 };
-                return { user: decoded };
+                return { user: decoded , headers: req.headers };
             }catch(error){
                 logger.warn(`Invalid or expired token ${error}`);
-                return { user: null };
+                return { user: null , headers: req.headers };
             }
         },
     }));

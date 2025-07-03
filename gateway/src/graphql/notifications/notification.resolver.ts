@@ -101,10 +101,15 @@ const notificationResolvers: IResolvers = {
                     return JSON.parse(cachedData);
                 }
 
-                const response = await axiosInstance.get(`/notifications?read=false&page=${args.input?.page}&limit=${args.input?.limit}`, {
+                const response = await axiosInstance.get(`/notifications`, {
                     baseURL: notificationServiceUrl,
                     headers: {
                         'x-user-id': context.user.userId
+                    },
+                    params: {
+                        read: false,
+                        page: args.input?.page,
+                        limit: args.input?.limit
                     }
                 });
 
@@ -143,10 +148,15 @@ const notificationResolvers: IResolvers = {
                     return JSON.parse(cachedData);
                 }
 
-                const response = await axiosInstance.get(`/notifications?read=true&page=${args.input?.page}&limit=${args.input?.limit}`, {
+                const response = await axiosInstance.get(`/notifications`, {
                     baseURL: notificationServiceUrl,
                     headers: {
                         'x-user-id': context.user.userId
+                    },
+                    params: {
+                        read: true,
+                        page: args.input?.page,
+                        limit: args.input?.limit
                     }
                 });
 
