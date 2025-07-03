@@ -3,11 +3,11 @@ import { z } from "zod";
 config();
 
 const envSchema = z.object({
-    PORT: z.string().default('3001'),
+    PORT: z.string().default('3000'),
     NODE_ENV: z.enum(['development','production']),
     JWT_SECRET: z.string(),
-    JWT_EXPIRY: z.string(),
     MONGO_URI: z.string(),
+    USER_SERVICE_URL: z.string().url(),
 });
 
 

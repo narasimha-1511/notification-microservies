@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
-export type UserPreferences = 'promotions' | 'newsletter' | 'order_updates' | 'recommendations';
+export type UserPreferences = 'PROMOTIONS' | 'NEWSLETTER' | 'ORDER_UPDATES' | 'RECOMMENDATIONS';
 
 interface IUser extends mongoose.Document {
     name: string;
@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema<IUser>({
     },
     preferences: {
         type: [String],
-        enum: ['promotions', 'newsletter', 'order_updates', 'recommendations'],
+        enum: ['PROMOTIONS', 'NEWSLETTER', 'ORDER_UPDATES', 'RECOMMENDATIONS'],
         default: [],
     }
 } , { timestamps : true });

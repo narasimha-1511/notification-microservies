@@ -33,6 +33,7 @@ export const login = async (req : Request, res: Response): Promise<any> => {
         return res.status(200).json({
             success: true,
             accessToken: token,
+            message: "User Logged In Successfully"
         })
     } catch (error) {
         logger.error(`error logging in ${error}`);
@@ -76,6 +77,72 @@ export const register = async (req : Request, res: Response): Promise<any> => {
         res.status(500).json({
             success: false,
             message: "Error Registering User"
+        })
+    }
+}
+
+export const getUser = async (req : Request, res: Response): Promise<any> => {
+    try {
+        const { userId } = req.params;
+
+        const user = await User.findById(userId);
+
+        console.log('this is the user' , user);
+
+        if(!user){
+            return res.status(400).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "User fetched successfully",
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                preferences: user.preferences
+            }
+        })
+    } catch (error) {
+        logger.error(`error fetching user ${error}`);
+        res.status(500).json({
+            success: false,
+            message: "Error Fetching User"
+        })
+    }
+}
+
+export const updateUserPreferences = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { userId } = req.params;
+        const { preferences } = req.body;
+
+        const user = await User.findById(userId);
+
+        if(!user){
+            console.log('this is the user' , user);
+            return res.status(400).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        user.preferences = preferences;
+        await user.save();
+
+        return res.status(200).json({
+            success: true,
+            message: "User preferences updated successfully",
+            updatedPreferences: user.preferences
+        })
+    } catch (error) {
+        logger.error(`error updating user preferences ${error}`);
+        res.status(500).json({
+            success: false,
+            message: "Error Updating User Preferences"
         })
     }
 }
