@@ -1,0 +1,28 @@
+{
+  "name": "notification-service",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "author": "Narasimha",
+  "license": "MIT",
+  "scripts": {
+    "dev": "ts-node-dev --transpile-only --respawn src/index.ts",
+    "start": "tsc -b && node dist/index.js",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "compression": "^1.8.0",
+    "dotenv": "^17.0.0",
+    "express": "^5.1.0",
+    "mongoose": "^8.16.1",
+    "morgan": "^1.10.0",
+    "winston": "^3.17.0",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "@types/compression": "^1.8.1",
+    "@types/express": "^5.0.3",
+    "@types/morgan": "^1.9.10",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.8.3"
+  }
+}

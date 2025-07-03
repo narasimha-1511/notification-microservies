@@ -1,4 +1,4 @@
-import { Request , Response , RequestHandler } from "express";
+import { Request , Response  } from "express";
 import logger from "../utils/logger";
 import User from "../models/user.model";
 import { signToken } from "../utils/jwt";
@@ -10,6 +10,7 @@ export const login = async (req : Request, res: Response): Promise<any> => {
         const user = await User.findOne({ email }).select('+password');
 
         if(!user){
+            logger.warn(`User not found ${email}`);
             return res.status(400).json({
                 success: false,
                 message: "User not found"
@@ -19,6 +20,7 @@ export const login = async (req : Request, res: Response): Promise<any> => {
         const isPasswordCorrect = await user.matchPassword(password);
 
         if(!isPasswordCorrect){
+            // logger.warn(`Invalid Password ${email}`);
             return res.status(400).json({
                 success: false,
                 message: "Invalid Password"
@@ -53,6 +55,7 @@ export const register = async (req : Request, res: Response): Promise<any> => {
         const user = await User.findOne({ email });
 
         if(user){
+            // logger.error(`User with this email already exists ${email}`);
             return res.status(400).json({
                 success: false,
                 message: "User with this email already exists"
@@ -87,14 +90,13 @@ export const getUser = async (req : Request, res: Response): Promise<any> => {
 
         const user = await User.findById(userId);
 
-        console.log('this is the user' , user);
-
         if(!user){
             return res.status(400).json({
                 success: false,
                 message: "User not found"
             });
         }
+
 
         return res.status(200).json({
             success: true,
@@ -117,13 +119,22 @@ export const getUser = async (req : Request, res: Response): Promise<any> => {
 
 export const updateUserPreferences = async (req: Request, res: Response): Promise<any> => {
     try {
-        const { userId } = req.params;
+
+        const userId = req.headers['x-user-id'] as string;
+
+        if(!userId){
+            logger.warn(`attempted to update user preferences without user ID`);
+            return res.status(400).json({
+                success: false,
+                message: "User ID is required"
+            });
+        }
+
         const { preferences } = req.body;
 
         const user = await User.findById(userId);
 
         if(!user){
-            console.log('this is the user' , user);
             return res.status(400).json({
                 success: false,
                 message: "User not found"

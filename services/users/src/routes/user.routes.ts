@@ -19,7 +19,7 @@ const router = express.Router();
 
 router.post("/login", validate(loginSchema), login);
 router.post("/register", validate(registerSchema), register);
-router.get("/user/:userId", getUser);
-router.put("/user/:userId/preferences", updateUserPreferences);
+router.get("/:userId", getUser);
+router.put("/preferences", updateUserPreferences);
 
 export default router;

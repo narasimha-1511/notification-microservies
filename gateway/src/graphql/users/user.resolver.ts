@@ -2,7 +2,7 @@ import { IResolvers } from "@graphql-tools/utils";
 import axiosInstance from "../../config/axios";
 import { getEnv } from "../../config/env";
 import logger from "../../utils/logger";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 
 const userServiceUrl = getEnv('USER_SERVICE_URL');
 
@@ -17,9 +17,15 @@ const userResolvers: IResolvers = {
 
                 return response.data;
 
-            } catch (error: any) {
-                logger.error('Registration error:' , error?.response?.data || error?.message);
-                return error?.response?.data || {
+            } catch (error) {
+                if(error instanceof AxiosError){
+                    if(error?.response?.status === 400){
+                        return error.response.data;
+                    }
+                }
+
+                logger.error('Registration error:' , error);
+                return {
                     success: false,
                     message: 'Failed to register user'
                 }
@@ -31,9 +37,14 @@ const userResolvers: IResolvers = {
                     baseURL: userServiceUrl
                 });
                 return response.data;
-            } catch (error: any) {
-                logger.error('Login error:', error.response?.data || error.message);
-                return error.response?.data || {
+            } catch (error) {
+                if(error instanceof AxiosError){
+                    if(error?.response?.status === 400){
+                        return error.response.data;
+                    }
+                }
+                logger.error('Login error:', error);
+                return {
                     success: false,
                     message: 'Failed to login'
                 };
@@ -41,14 +52,17 @@ const userResolvers: IResolvers = {
         },
         updatePreferences: async (_, args, context) => {
             try {
-                if(!context.user || context.user === null || context.user === undefined){
+                if(!context.user || context.user === null){
                     return {
                         success: false,
                         message: 'Invalid or Expired token'
                     }
                 }
 
-                const response = await axiosInstance.put(`/user/${context.user.userId}/preferences`, args.input, {
+                const response = await axiosInstance.put(`/preferences`, args.input, {
+                    headers: {
+                        'x-user-id': context.user.userId
+                    },
                     baseURL: userServiceUrl
                 });
 
@@ -58,8 +72,13 @@ const userResolvers: IResolvers = {
                     updatedPreferences: response.data.updatedPreferences
                 }
             } catch (error: any) {
+                if(error instanceof AxiosError){
+                    if(error?.response?.status === 400){
+                        return error.response.data;
+                    }
+                }
                 logger.error('Preferences error:', error.response?.data || error.message);
-                return error.response?.data || {
+                return {
                     success: false,
                     message: 'Failed to update preferences'
                 }
@@ -76,18 +95,31 @@ const userResolvers: IResolvers = {
                     }
                 }
 
-                const response = await axiosInstance.get(`/user/${context.user.userId}`, {
-                    baseURL: userServiceUrl
-                });
+                const response = await axiosInstance.get(`/${context.user.userId}`,
+                    {
+                        headers: {
+                            'x-user-id': context.user.userId
+                        },
+                        baseURL: userServiceUrl
+                    }
+                );
 
                 return {
                     success: true,
                     message: 'User fetched successfully',
                     user: response.data.user
                 }
-            } catch (error: any) {
-                logger.error('User error:' , error?.response?.data || error?.message);
-                return error?.response?.data || {
+            } catch (error) {
+                if(error instanceof AxiosError){
+                    if(error?.response?.status === 400){
+                        return {
+                            success: false,
+                            message: error?.response?.data?.message || 'Failed to get user'
+                        }
+                    }
+                }
+                logger.error('getting user error:' , error);
+                return {
                     success: false,
                     message: 'Failed to get user'
                 }

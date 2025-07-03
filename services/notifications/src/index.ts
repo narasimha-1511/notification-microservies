@@ -1,17 +1,16 @@
-import { startGraphQlServer , app } from "./app";
+import app from "./app";
+import connectDB from "./config/db";
 import { getEnv } from "./config/env";
-import { redisClient } from "./config/redis";
 import logger from "./utils/logger";
 
 const main = async () => {
-    try{
-        await redisClient.connect();
-        await startGraphQlServer(app);
+    try {
+        await connectDB();
         app.listen(getEnv('PORT'), () => {
             logger.info(`Server is running on port ${getEnv('PORT')}`);
         });
-    }catch(error){
-        logger.error(`error Starting Server ${error}`);
+    } catch (error) {
+        logger.error(`Error starting server: ${error}`);
         process.exit(1);
     }
 }
