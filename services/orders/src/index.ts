@@ -1,8 +1,8 @@
 import app from "./app";
 import connectDB from "./config/db";
 import { getEnv } from "./config/env";
-import { connectToRabbitMq } from "./utils/rabbitMq";
 import logger from "./utils/logger";
+import { connectToRabbitMq } from "./utils/rabbitMq";
 import handlers from "./handlers";
 
 const main = async () => {
@@ -10,7 +10,7 @@ const main = async () => {
     await connectDB();
     await connectToRabbitMq();
     await handlers();
-
+    
     app.listen(getEnv("PORT"), () => {
       logger.info(`Server is running on port ${getEnv("PORT")}`);
     });

@@ -11,7 +11,7 @@ const invalidateCache = async () => {
 
 const productResolvers: IResolvers = {
     Query: {
-        products: async (_, args, _context) => {
+        getAllProducts: async (_, args, _context) => {
             try {
 
                 const page = parseInt(args.input?.page as string) || 1;
@@ -46,7 +46,7 @@ const productResolvers: IResolvers = {
             }
            
         },
-        product: async (_, args, _context) => {
+        getProductById: async (_, args, _context) => {
             try {
 
                 const productId = args.id;

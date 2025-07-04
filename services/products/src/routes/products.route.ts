@@ -1,5 +1,5 @@
 import express from "express";
-import { addProduct, getAllProducts, getProductById } from "../controllers/product.controller";
+import { addProduct, getAllProducts, getProductById, getProductsByIds } from "../controllers/product.controller";
 import validate from "../middlewares/validate.middleware";
 import z from "zod";
 
@@ -15,5 +15,7 @@ const addProductSchema = z.object({
 router.get("/products", getAllProducts);
 router.get("/products/:id", getProductById);
 router.post("/product", validate(addProductSchema), addProduct);
+
+router.get("/productsByIds", getProductsByIds);
 
 export default router;

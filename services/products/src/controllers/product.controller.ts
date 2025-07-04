@@ -107,3 +107,40 @@ export const addProduct = async (req: Request, res: Response): Promise<any> => {
         });
     }
 }
+
+export const getProductsByIds = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const ids = req.query.ids;
+
+        const productIds = ids?.toString().split(',') || [];
+
+        if (!productIds.length) {
+            return res.status(400).json({
+                success: false,
+                message: "No product ids provided"
+            });
+        }
+
+        const products = await Product.find({ _id: { $in: productIds } });
+
+        res.status(200).json({
+            success: true,
+            message: "Products fetched successfully",
+            products: products.map((product) => ({
+                id: product._id,
+                name: product.name,
+                description: product.description,
+                price: product.price,
+                quantity: product.quantity,
+                createdAt: product.createdAt,
+            }))
+        });
+        
+    } catch (error) {
+        logger.error(`Error fetching products by ids ${error}`);
+        res.status(500).json({
+            success: false,
+            message: "Error fetching products by ids"
+        });
+    }
+}

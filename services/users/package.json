@@ -9,6 +9,7 @@
     "start": "tsc && node dist/index.js"
   },
   "dependencies": {
+    "amqplib": "^0.10.8",
     "bcryptjs": "^3.0.2",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",

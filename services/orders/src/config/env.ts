@@ -3,16 +3,12 @@ import { z } from "zod";
 config();
 
 const envSchema = z.object({
-    PORT: z.string().default('3000'),
+    PORT: z.string().default('3004'),
     NODE_ENV: z.enum(['development','production']),
-    JWT_SECRET: z.string(),
     MONGO_URI: z.string(),
-    USER_SERVICE_URL: z.string().url(),
-    NOTIFICATION_SERVICE_URL: z.string().url(),
-    PRODUCT_SERVICE_URL: z.string().url(),
-    ORDER_SERVICE_URL: z.string().url(),
-    REDIS_URL: z.string().url(),
-    ADMIN_SECRET: z.string()
+    PRODUCT_SERVICE_URL: z.string(),
+    RABBITMQ_URL: z.string(),
+    RABBITMQ_EXCHANGE: z.string()
 });
 
 

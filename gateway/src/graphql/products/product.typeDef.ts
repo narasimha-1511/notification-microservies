@@ -43,8 +43,8 @@ const productTypeDef = gql`
     }
 
     type Query {
-        products( input: ProductsInput): ProductsResponse!
-        product(id: ID!): ProductResponse!
+        getAllProducts(input: ProductsInput): ProductsResponse!
+        getProductById(id: ID!): ProductResponse!
     }
 
     type Mutation {
