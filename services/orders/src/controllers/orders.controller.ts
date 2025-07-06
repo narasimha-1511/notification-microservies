@@ -22,9 +22,8 @@ export const placeOrder = async (req: Request, res: Response): Promise<any> => {
         for(const product of products){
             productsMap.set(product.id, product.quantity);
         }
-
-        const productServiceUrl = getEnv("PRODUCT_SERVICE_URL");       
-        const response = await fetch(`${productServiceUrl}/productsByIds?ids=${Array.from(productsMap.keys()).join(",")}`);
+    
+        const response = await fetch(`${getEnv("PRODUCT_SERVICE_URL")}/productsByIds?ids=${Array.from(productsMap.keys()).join(",")}`);
 
         const productsData = await response.json();
 
@@ -235,7 +234,14 @@ export const purchasedProductsByUserIds = async (req: Request, res: Response): P
             }
         }
 
-        res.status(200).json(Array.from(productsMap.values()));
+        const result = Array.from(productsMap.entries()).map(([userId, products]) => {
+            return {
+                userId,
+                products: Array.from(products)
+            }
+        });
+
+        res.status(200).json(result);
     } catch (error) {
         logger.error(`Error fetching purchased products by user ids: ${error}`);
         res.status(500).json({

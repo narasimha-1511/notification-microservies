@@ -10,7 +10,8 @@ const notificationTypeDef = gql`
 
     type Notification {
         id: ID!
-        type: [NotificationType!]!
+        userId: ID!
+        type: NotificationType!
         content: String!
         sentAt: String!
         read: Boolean!

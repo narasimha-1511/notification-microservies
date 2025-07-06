@@ -16,13 +16,14 @@ const getRecommendationsSchema = z.object({
     userIds: z.array(z.string()).min(1),
 });
 
-router.get("/products", getAllProducts);
-router.get("/products/:id", getProductById);
-router.post("/product", validate(addProductSchema), addProduct);
-
-router.get("/productsByIds", getProductsByIds);
 
 //made this post because we need to do batch requests
-router.post("/recommendations", validate(getRecommendationsSchema), getRecommendations);
+router.get("/productsByIds", getProductsByIds); //used in orders service
+router.post("/recommendations", validate(getRecommendationsSchema), getRecommendations); //used in scheduler service
+
+router.post("/product", validate(addProductSchema), addProduct);
+router.get("/products", getAllProducts);
+router.get("/:id", getProductById);
+
 
 export default router;

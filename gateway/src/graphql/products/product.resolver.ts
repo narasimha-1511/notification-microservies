@@ -4,6 +4,8 @@ import { redisClient } from "../../config/redis";
 import { getEnv } from "../../config/env";
 import logger from "../../utils/logger";
 
+const productServiceUrl = getEnv("PRODUCT_SERVICE_URL");
+
 const invalidateCache = async () => {
     const keys = await redisClient.keys("products:*");
     await Promise.all(keys.map(key => redisClient.del(key)));
@@ -32,7 +34,7 @@ const productResolvers: IResolvers = {
                         page,
                         limit
                     },
-                    baseURL: getEnv("PRODUCT_SERVICE_URL")
+                    baseURL: productServiceUrl
                 });
 
                 const result = response.data;
@@ -61,8 +63,8 @@ const productResolvers: IResolvers = {
                     return JSON.parse(cachedData);
                 }
 
-                const response = await axiosInstance.get(`/products/${productId}`, {
-                    baseURL: getEnv("PRODUCT_SERVICE_URL")
+                const response = await axiosInstance.get(`/${productId}`, {
+                    baseURL: productServiceUrl
                 });
 
                 const result = response.data;
@@ -91,7 +93,7 @@ const productResolvers: IResolvers = {
                 }
 
                 const response = await axiosInstance.post(`/product`, args.input, {
-                    baseURL: getEnv("PRODUCT_SERVICE_URL"),
+                    baseURL: productServiceUrl,
                 });
 
                 await invalidateCache();

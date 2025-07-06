@@ -160,8 +160,38 @@ export const updateUserPreferences = async (req: Request, res: Response): Promis
 
 export const getAllUsers = async (req: Request , res: Response): Promise<any> => {
     try {
-        const users = await User.find();
+        const preferenceTypes = ['PROMOTIONS', 'NEWSLETTER', 'ORDER_UPDATES', 'RECOMMENDATIONS'];
+
+        const queryPreferences = req.query.preferences as string;
+
+        if(!queryPreferences){
+            const users = await User.find();
+            return res.status(200).json(users);
+        }
+
+        const queryPreferencesArray = queryPreferences.split(',');
+
+        for(const preference of queryPreferencesArray){
+            if(!preferenceTypes.includes(preference)){
+                return res.status(400).json({
+                    success: false,
+                    message: "Invalid preference"
+                });
+            }
+        }
+
+        const users = await User.find({
+            preferences: {
+                $in: queryPreferencesArray
+            },
+        }, {
+            _id : 1,
+        });
+
+        console.log(users);
+
         return res.status(200).json(users);
+        
     } catch (error) {
         logger.error(`error fetching all users ${error}`);
         res.status(500).json({

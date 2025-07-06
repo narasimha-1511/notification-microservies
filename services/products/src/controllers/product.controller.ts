@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import logger from "../utils/logger";
 import Product from "../models/product.model";
 import { getEnv } from "../config/env";
+import { ObjectId } from "mongoose";
 
 export const getAllProducts = async (req: Request , res: Response) => {
     try {
@@ -159,8 +160,16 @@ export const getRecommendations = async (req:Request , res:Response): Promise<an
         const _productsMap = new Map<string, Set<string>>();
         const bestProductsMap = new Map<string, number>();
 
-        for (const batch of usersBacthes){
+        //get all the products with latest new products first
+        const  products = await Product.find({
+            quantity: { $gt: 0 }
+        }).sort({ createdAt: -1 });
 
+        for(const product of products){
+            bestProductsMap.set(product?._id?.toString() || "", 0);
+        }
+
+        for (const batch of usersBacthes){
 
             const products = await fetch(`${getEnv("ORDERS_SERVICE_URL")}/purchasedProductsByUserIds`, {
                 method: "POST",
@@ -195,12 +204,12 @@ export const getRecommendations = async (req:Request , res:Response): Promise<an
         //products purchased by most number of users in ranking order
         const bestProductsMapArray = Array.from(bestProductsMap.entries()).sort((a, b) => b[1] - a[1]);
         const bestProducts = bestProductsMapArray.map((product) => product[0]);
+
         
         //products purchased by most number of users but not purchased by the user
         const recommendationsMap = new Map<string, string[]>();
 
         for(const [userId, products] of _productsMap.entries()){
-            
             //iterate over best products and get top3
             const recommendations = [];
             for(const product of bestProducts){
@@ -215,10 +224,19 @@ export const getRecommendations = async (req:Request , res:Response): Promise<an
             recommendationsMap.set(userId, recommendations);
         }
 
+        const recommendations = Array.from(recommendationsMap.entries()).map(([userId, _products]) => ({
+            userId,
+            products: Array.from(_products).map(product => {
+                const productId = product.toString();
+                const productData = products.find(p => p._id == productId);
+                return productData?.name ? productData?.name : productId;
+            })
+        }));
+
         res.status(200).json({
             success: true,
             message: "Recommendations fetched successfully",
-            recommendations: Array.from(recommendationsMap.entries())
+            recommendations
         });
 
 

@@ -31,7 +31,8 @@ export const postNotification = async (req: Request, res: Response): Promise<any
                 type: notification.type,
                 content: notification.content,
                 read: notification.read,
-                sentAt: notification.sentAt
+                sentAt: notification.sentAt,
+                userId: notification.userId
             }
         });
 
@@ -110,7 +111,8 @@ export const getNotifications = async (req: Request, res: Response): Promise<any
                 type: notification.type,
                 content: notification.content,
                 read: notification.read,
-                sentAt: notification.sentAt
+                sentAt: notification.sentAt,
+                userId: notification.userId
             })),
             totalNotifications: total,
             currentPage: page,
@@ -163,7 +165,8 @@ export const getNotificationById = async (req: Request, res: Response): Promise<
                 type: notification.type,
                 content: notification.content,
                 read: notification.read,
-                sentAt: notification.sentAt
+                sentAt: notification.sentAt,
+                userId: notification.userId
             }
         });
     } catch (error) {

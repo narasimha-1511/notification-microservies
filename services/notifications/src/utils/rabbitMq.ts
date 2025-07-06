@@ -11,7 +11,7 @@ export const consumeEvent = async (exchange: string, key: string, callback: (mes
             await connectToRabbitMq([exchange]);
         }
 
-        const queue = await channel?.assertQueue("notifications-queue", { exclusive: true });
+        const queue = await channel?.assertQueue(`notifications-queue-${key}`, { durable: true });
         await channel?.bindQueue(queue?.queue as string , exchange, key);
 
         channel?.consume(queue?.queue as string, async (message) => {

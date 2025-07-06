@@ -7,16 +7,11 @@ import { generateRecommendations } from "./generateRecommendations";
 export const startScheduler = async () => {
     try {
         
-        //promotions every 2 minutes
-        nodeCron.schedule("*/2 * * * *", async () => {
+        nodeCron.schedule("* */24 * * *", async () => {
             await generatePromotions();
+            await generateRecommendations();
         });
-
-        //recommendations every 10 minutes
-        // nodeCron.schedule("*/10 * * * *", async () => {
-        //     await generateRecommendations();
-        // });
-
+ 
         logger.info("Scheduler started successfully");
     } catch (error) {
         logger.error(`Error starting scheduler: ${error}`);

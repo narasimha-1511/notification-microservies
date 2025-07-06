@@ -17,12 +17,14 @@ const registerSchema = z.object({
 
 const router = express.Router();
 
+//using this internally 
+router.get("/allUsers" , getAllUsers);
+
 router.post("/login", validate(loginSchema), login);
 router.post("/register", validate(registerSchema), register);
 router.get("/:userId", getUser);
 router.put("/preferences", updateUserPreferences);
 
-//using this internally 
-router.get("/users" , getAllUsers);
+
 
 export default router;

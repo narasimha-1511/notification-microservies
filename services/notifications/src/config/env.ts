@@ -8,6 +8,7 @@ const envSchema = z.object({
     MONGO_URI: z.string(),
     RABBITMQ_URL: z.string().url(),
     RABBITMQ_EXCHANGE: z.string(),
+    USER_SERVICE_URL: z.string().url(),
 });
 
 
