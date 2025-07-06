@@ -6,7 +6,6 @@ const envSchema = z.object({
     PORT: z.string().default('3000'),
     NODE_ENV: z.enum(['development','production']),
     JWT_SECRET: z.string(),
-    MONGO_URI: z.string(),
     USER_SERVICE_URL: z.string().url(),
     NOTIFICATION_SERVICE_URL: z.string().url(),
     PRODUCT_SERVICE_URL: z.string().url(),
