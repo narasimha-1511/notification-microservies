@@ -1,11 +1,10 @@
 import mongoose from "mongoose";
-import { string } from "zod";
 
 export type UserPreferences = 'PROMOTIONS' | 'NEWSLETTER' | 'ORDER_UPDATES' | 'RECOMMENDATIONS';
 
 interface INotification extends mongoose.Document {
     userId: string;
-    type: UserPreferences[];
+    type: UserPreferences;
     content: string;
     read: boolean;
     sentAt: Date;
@@ -18,7 +17,7 @@ const notificationSchema = new mongoose.Schema<INotification>({
     },
     type:{
         required: true,
-        type: [String],
+        type: String,
         enum: ['PROMOTIONS', 'NEWSLETTER', 'ORDER_UPDATES', 'RECOMMENDATIONS'],
     },
     content:{

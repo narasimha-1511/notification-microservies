@@ -1,4 +1,6 @@
+import { config } from "dotenv";
 import winston from "winston";
+config();
 
 const logger = winston.createLogger({
     level: process.env.NODE_ENV === "production" ? "info" : "debug",

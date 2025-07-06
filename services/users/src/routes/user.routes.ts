@@ -1,5 +1,5 @@
 import express from "express";
-import { getUser, login, register, updateUserPreferences } from "../controllers/user.controller";
+import { getUser, login, register, updateUserPreferences , getAllUsers} from "../controllers/user.controller";
 import validate from "../middlewares/validate.middleware";
 import { z } from "zod";
 
@@ -21,5 +21,8 @@ router.post("/login", validate(loginSchema), login);
 router.post("/register", validate(registerSchema), register);
 router.get("/:userId", getUser);
 router.put("/preferences", updateUserPreferences);
+
+//using this internally 
+router.get("/users" , getAllUsers);
 
 export default router;

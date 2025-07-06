@@ -3,6 +3,17 @@ import { getEnv } from "../../config/env";
 import axiosInstance from "../../config/axios";
 import logger from "../../utils/logger";
 import { AxiosError } from "axios";
+import { redisClient } from "../../config/redis";
+
+const invalidateCache = async (userId: string) => {
+    const keys = await redisClient.keys(`orders:${userId}:*`);
+    await Promise.all(keys.map(key => redisClient.del(key)));
+
+    const _keys = await redisClient.keys(`products:*`);
+    await Promise.all(_keys.map(key => redisClient.del(key)));
+
+    logger.info(`invalidated cache for user: ${userId}`);
+}
 
 const orderServiceUrl = getEnv("ORDER_SERVICE_URL");
 
@@ -27,6 +38,12 @@ const ordersResolvers : IResolvers = {
                     baseURL: orderServiceUrl
                 });
     
+                await invalidateCache(context.user.userId);
+
+                for ( const product of products){
+                    await redisClient.del(`product:${product.id}`);
+                }
+
                 return response.data;
             } catch (error) {
                 logger.error(`Error placing order: ${error}`);
@@ -59,6 +76,9 @@ const ordersResolvers : IResolvers = {
                     baseURL: orderServiceUrl
                 });
 
+                await invalidateCache(context.user.userId);
+                await redisClient.del(`order:${id}`);
+
                 return response.data;
             } catch (error) {
                 logger.error(`Error updating order status: ${error}`);
@@ -85,12 +105,21 @@ const ordersResolvers : IResolvers = {
                     }
                 }
 
+                const cacheKey = `order:${id}`;
+                const cachedData = await redisClient.get(cacheKey);
+                if(cachedData){
+                    logger.info(`cache hit for order: ${id}`);
+                    return JSON.parse(cachedData);
+                }
+
                 const response = await axiosInstance.get(`/order/${id}`, {
                     headers: {
                         "x-user-id": context.user.userId
                     },
                     baseURL: orderServiceUrl
                 });
+
+                await redisClient.setex(cacheKey, 900, JSON.stringify(response.data));
 
                 return response.data;
             } catch (error) {
@@ -116,6 +145,16 @@ const ordersResolvers : IResolvers = {
                     }
                 }
 
+                page = page || 1;
+                limit = limit || 10;
+
+                const cacheKey = `orders:${context.user.userId}:${page}:${limit}`;
+                const cachedData = await redisClient.get(cacheKey);
+                if(cachedData){
+                    logger.info(`cache hit for orders: ${context.user.userId}:${page}:${limit}`);
+                    return JSON.parse(cachedData);
+                }
+
                 const response = await axiosInstance.get(`/orders`, {
                     headers: {
                         "x-user-id": context.user.userId
@@ -126,6 +165,8 @@ const ordersResolvers : IResolvers = {
                         limit
                     }
                 });
+
+                await redisClient.setex(cacheKey, 900, JSON.stringify(response.data));
 
                 return response.data;
             } catch (error) {

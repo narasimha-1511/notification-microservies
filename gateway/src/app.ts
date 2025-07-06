@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import { ApolloServer, ApolloServerPlugin } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4"
-import logger , {loggerMiddleware} from "./utils/logger";
+import logger  from "./utils/logger";
 import { getEnv } from "./config/env";
 import jwt from "jsonwebtoken";
 import { Schema } from "./graphql/index";
@@ -11,7 +11,6 @@ import compression from "compression";
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(loggerMiddleware);
 app.use(compression() as unknown as express.RequestHandler);
 
 const requestLoggerPlugIn :ApolloServerPlugin = {

@@ -6,6 +6,8 @@ const envSchema = z.object({
     PORT: z.string().default('3002'),
     NODE_ENV: z.enum(['development','production']),
     MONGO_URI: z.string(),
+    RABBITMQ_URL: z.string().url(),
+    RABBITMQ_EXCHANGE: z.string(),
 });
 
 

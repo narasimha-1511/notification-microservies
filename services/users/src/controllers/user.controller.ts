@@ -157,3 +157,16 @@ export const updateUserPreferences = async (req: Request, res: Response): Promis
         })
     }
 }
+
+export const getAllUsers = async (req: Request , res: Response): Promise<any> => {
+    try {
+        const users = await User.find();
+        return res.status(200).json(users);
+    } catch (error) {
+        logger.error(`error fetching all users ${error}`);
+        res.status(500).json({
+            success: false,
+            message: "Error Fetching All Users"
+        })
+    }
+}

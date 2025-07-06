@@ -8,7 +8,7 @@ import handlers from "./handlers";
 const main = async () => {
   try {
     await connectDB();
-    await connectToRabbitMq();
+    await connectToRabbitMq(["orders-exchange"]);
     await handlers();
     
     app.listen(getEnv("PORT"), () => {

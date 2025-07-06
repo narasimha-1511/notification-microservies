@@ -23,8 +23,7 @@ export const placeOrder = async (req: Request, res: Response): Promise<any> => {
             productsMap.set(product.id, product.quantity);
         }
 
-        const productServiceUrl = getEnv("PRODUCT_SERVICE_URL");
-
+        const productServiceUrl = getEnv("PRODUCT_SERVICE_URL");       
         const response = await fetch(`${productServiceUrl}/productsByIds?ids=${Array.from(productsMap.keys()).join(",")}`);
 
         const productsData = await response.json();
@@ -37,16 +36,16 @@ export const placeOrder = async (req: Request, res: Response): Promise<any> => {
             });
         }
 
-        // for(const product of productsData.products){
-        //     const quantity = productsMap.get(product.id);
-        //     if(!quantity || quantity > product.quantity){
-        //         logger.error(`Insufficient quantity for product ${product.id}`);
-        //         return res.status(400).json({
-        //             success: false,
-        //             message: `Insufficient quantity for product ${product.id}`
-        //         });
-        //     }
-        // }
+        for(const product of productsData.products){
+            const quantity = productsMap.get(product.id);
+            if(!quantity || quantity > product.quantity){
+                logger.error(`Insufficient quantity for product ${product.id}`);
+                return res.status(400).json({
+                    success: false,
+                    message: `Insufficient quantity for product ${product.id}`
+                });
+            }
+        }
 
         const order = await Order.create({
             userId,
@@ -54,7 +53,7 @@ export const placeOrder = async (req: Request, res: Response): Promise<any> => {
             status: "PENDING"
         });
 
-        await publishEvent("order.placed", {
+        await publishEvent("orders-exchange", "order.placed", {
             orderId: order._id,
             userId,
             products: order.products
@@ -82,7 +81,7 @@ export const placeOrder = async (req: Request, res: Response): Promise<any> => {
 
 export const getOrderById = async (req: Request, res: Response): Promise<any> => {
     try {
-        const userId = req.headers['x-user-id'];
+        const userId = req.headers['x-user-id'] || (req.query.userId as string);
 
         if(!userId){
             logger.warn(`attempted to get order without user ID`);
@@ -125,7 +124,7 @@ export const getOrderById = async (req: Request, res: Response): Promise<any> =>
 
 export const getAllOrders = async (req: Request, res: Response): Promise<any> => {
     try {
-        const userId = req.headers['x-user-id'];
+        const userId = req.headers['x-user-id'] || (req.query.userId as string);
 
         if(!userId){
             logger.warn(`attempted to get all orders without user ID`);
@@ -190,7 +189,7 @@ export const updateOrderStatus = async (req: Request, res: Response): Promise<an
 
         await order.save();
 
-        await publishEvent("order.status.updated", {
+        await publishEvent("orders-exchange", "order.status_updated", {
             orderId: order._id,
             userId: order.userId,
             status: order.status
@@ -208,6 +207,37 @@ export const updateOrderStatus = async (req: Request, res: Response): Promise<an
         });
     } catch (error) {
         logger.error(`Error updating order status: ${error}`);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+}
+
+export const purchasedProductsByUserIds = async (req: Request, res: Response): Promise<any> => {
+    try {
+        const { userIds } = req.body as { userIds: string[] };
+
+        const orders = await Order.find(
+            { userId: { $in: userIds } , status: { $ne: "CANCELLED" } },
+            { "products.id" : 1 , userId: 1 }
+        );
+
+        const productsMap = new Map<string, Set<string>>();
+
+        for(const order of orders){
+            for(const product of order.products){
+                if(productsMap.has(order.userId)){
+                    productsMap.get(order.userId)!.add(product.id);
+                }else{
+                    productsMap.set(order.userId, new Set([product.id]));
+                }
+            }
+        }
+
+        res.status(200).json(Array.from(productsMap.values()));
+    } catch (error) {
+        logger.error(`Error fetching purchased products by user ids: ${error}`);
         res.status(500).json({
             success: false,
             message: "Internal server error"

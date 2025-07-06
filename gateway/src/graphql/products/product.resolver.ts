@@ -7,6 +7,7 @@ import logger from "../../utils/logger";
 const invalidateCache = async () => {
     const keys = await redisClient.keys("products:*");
     await Promise.all(keys.map(key => redisClient.del(key)));
+    logger.info(`invalidated cache for products`);
 }
 
 const productResolvers: IResolvers = {

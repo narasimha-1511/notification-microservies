@@ -4,8 +4,13 @@
   "main": "src/index.ts",
   "author": "Narasimha",
   "license": "MIT",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "start": "tsc && node dist/index.js"
+  },
   "dependencies": {
     "amqplib": "^0.10.8",
+    "axios": "^1.10.0",
     "dotenv": "^17.0.1",
     "node-cron": "^4.2.0",
     "winston": "^3.17.0"

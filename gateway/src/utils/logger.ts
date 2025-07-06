@@ -1,7 +1,5 @@
 import winston from "winston";
-import morgan from "morgan";
 import { getEnv } from "../config/env";
-import express from "express";
 
 const logger = winston.createLogger({
     level: getEnv('NODE_ENV') === "production" ? "info" : "debug",
@@ -30,15 +28,5 @@ const logger = winston.createLogger({
     ]
 })
 
-export const loggerMiddleware = (req: Express.Request, res: express.Response, next: express.NextFunction) => {
-    morgan('dev', {
-        stream: {
-            write: (message) => {
-                logger.info(message.trim());
-            }
-        }
-    });
-    next();
-}
 
 export default logger;

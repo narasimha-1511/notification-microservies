@@ -1,5 +1,6 @@
 import amqp from "amqplib";
 import logger from "./logger";
+import { getEnv } from "../config/env";
 
 let connection: amqp.ChannelModel | null = null;
 let channel: amqp.Channel | null = null;
@@ -10,7 +11,7 @@ export const consumeEvent = async (exchange: string, key: string, callback: (mes
             await connectToRabbitMq([exchange]);
         }
 
-        const queue = await channel?.assertQueue("scheduler-queue", { exclusive: true });
+        const queue = await channel?.assertQueue("products-queue", { exclusive: true });
         await channel?.bindQueue(queue?.queue as string , exchange, key);
 
         channel?.consume(queue?.queue as string, async (message) => {
@@ -42,11 +43,7 @@ export const connectToRabbitMq = async (exchanges: string[]) => {
             return;
         }
 
-        if(!process.env.RABBITMQ_URL){
-            throw new Error("RABBITMQ_URL is not set in environment variables");
-        }
-
-        connection = await amqp.connect(process.env.RABBITMQ_URL as string);
+        connection = await amqp.connect(getEnv("RABBITMQ_URL"));
         channel = await connection.createChannel();
 
         for(const exchange of exchanges){
@@ -69,7 +66,7 @@ export const publishEvent = async (exchange: string, key: string, message: any) 
 
         channel?.publish(exchange, key, Buffer.from(JSON.stringify(message)));
 
-        logger.info(`Event ${key} published to ${exchange}`);
+        logger.info(`Event published to ${key}`);
 
     } catch (error) {
         logger.error(`Error publishing event: ${key} ${error}`);
