@@ -2,6 +2,22 @@ version: '3.8'
 
 services:
 
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - backend
+
+  grafana:
+    image: grafana/grafana-oss
+    ports:
+      - "3000:3000"
+    networks:
+      - backend
+
   redis:
     image: redis:alpine
     ports:
@@ -154,9 +170,9 @@ services:
       context: ./gateway
       dockerfile: Dockerfile
     ports:
-      - "3000:3000"
+      - "8000:8000"
     environment:
-      - PORT=3000
+      - PORT=8000
       - NODE_ENV=development
       - JWT_SECRET=secret
       - USER_SERVICE_URL=http://users-service:3001

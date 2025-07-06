@@ -60,49 +60,36 @@ graph TD
 
 ### User Service
 
-- **Responsibilities:**
   - Register users (name, email, preferences)
   - Update user preferences (e.g., notification types: promotions, order updates, recommendations)
   - Fetch user details
   - JWT-based authentication
 
-- **Events:**
-  - Emits user creation/update events to RabbitMQ
-
 ### Notification Service
 
-- **Responsibilities:**
   - Store notifications (id, userId, type, content, sentAt, read)
   - Mark notifications as read
   - Fetch unread notifications for a user
   - Fetch read notifcations for a user
   - Listen for events (e.g., order updates, promotions, recommendations) and create notifications
 
-- **Events:**
-  - Emits notification events (e.g., notification sent/read)
-
 ### Product Service
 
-- **Responsibilities:**
   - Manage product catalog
   - Listen for order events to update inventory
-  - Emit product recommendation events
 
 ### Order Service
 
-- **Responsibilities:**
-  - Manage orders (mock data)
-  - Emit order status update events
+  - Manage orders
+  - Emits order status update events
 
 ### Scheduler Service
 
-- **Responsibilities:**
-  - Periodically send order status updates and promotional notifications (using cron jobs or background jobs)
+  - Periodically send order status updates and promotional notifications (using cron jobs)
   - Push notifications to users based on preferences
 
 ### GraphQL Gateway
 
-- **Responsibilities:**
   - Expose a unified GraphQL API for all client interactions
   - Aggregate data from all microservices
   - Authenticate requests using JWT
@@ -119,8 +106,8 @@ graph TD
 
 ## Personalized Recommendations
 
-- The system generates product recommendations based on mock purchase history and browsing activity.
-- Recommendations are stored and sent as notifications to users, respecting their preferences.
+- The system generates product recommendations based on purchase history.
+- Recommendations are sent as notifications to users, respecting their preferences.
 
 ---
 
@@ -136,34 +123,14 @@ graph TD
 ### Prerequisites
 
 - Node.js (v16+)
-- Yarn or npm
 - Docker & Docker Compose
 - RabbitMQ 
 - MongoDB
 
 ### Environment Variables
 
-Each service has its own `.example.env`. Key variables include:
-
-- `MONGO_URI`
-- `JWT_SECRET` (User Service & Gateway)
+Each service has its own `.example.env`.
 
 ### Local Development
 
 - Everything can be run locally using `docker compose up`
-
----
-
-## Extending & Monitoring
-
-- **Caching:** The GraphQL Gateway can cache frequently queried data (e.g., product listings).
-- **Monitoring:** Integrate Prometheus/Grafana for monitoring RabbitMQ and service health.
-- **Dead-letter Queues:** RabbitMQ can be configured to handle event delivery failures.
-
----
-
-## Notes
-
-- Personalized recommendations are based on mock data and can be extended.
-- The system is designed for flexibility and can be extended with more services (e.g., analytics, recommendations).
-- All code is modular and follows best practices for maintainability and scalability.

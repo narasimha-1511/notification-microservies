@@ -4,9 +4,13 @@ import { getEnv } from "./config/env";
 import logger from "./utils/logger";
 import { connectToRabbitMq } from "./utils/rabbitMq";
 import handlers from "./handlers";
+import { collectDefaultMetrics, register } from "prom-client";
 
 const main = async () => {
     try {
+        //monitoring
+        collectDefaultMetrics({register: register});
+
         await connectDB();
         await connectToRabbitMq(["orders-exchange", "notifications-exchange"]);
         await handlers();

@@ -1,3 +1,4 @@
+import { collectDefaultMetrics, register } from "prom-client";
 import { startGraphQlServer , app } from "./app";
 import { getEnv } from "./config/env";
 import { redisClient } from "./config/redis";
@@ -5,6 +6,9 @@ import logger from "./utils/logger";
 
 const main = async () => {
     try{
+        //monitoring by prometheus
+        collectDefaultMetrics({register: register});
+
         await redisClient.connect();
         await startGraphQlServer(app);
         app.listen(getEnv('PORT'), () => {

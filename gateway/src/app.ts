@@ -7,11 +7,18 @@ import { getEnv } from "./config/env";
 import jwt from "jsonwebtoken";
 import { Schema } from "./graphql/index";
 import compression from "compression";
+import { register } from "prom-client";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(compression() as unknown as express.RequestHandler);
+app.get('/metrics' , async (_req , res) => {
+    //setting prometheus
+    res.setHeader('content-type', register.contentType);
+    const metrics = await register.metrics();
+    res.send(metrics);
+})
 
 const requestLoggerPlugIn :ApolloServerPlugin = {
     async requestDidStart() {
