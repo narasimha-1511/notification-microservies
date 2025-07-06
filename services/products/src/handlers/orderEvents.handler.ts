@@ -15,14 +15,12 @@ interface orderPlacedMessage {
 // order.placed
 export const handleOrderPlacedEvent = async (message: orderPlacedMessage) : Promise<boolean> => {
     return new Promise(async (resolve, reject) => {
-        const session = await mongoose.startSession();
-        session.startTransaction();
         try {
             const { orderId, userId, products } = message;
             logger.info(`processing event: order.placed for order ${orderId} for user ${userId}`);
 
             for(const _product of products){
-                const product = await Product.findOne({ _id: _product.id }).session(session);
+                const product = await Product.findOne({ _id: _product.id });
 
                 if(!product || product.quantity < _product.quantity){
                     if(!product || product == null){
@@ -38,29 +36,22 @@ export const handleOrderPlacedEvent = async (message: orderPlacedMessage) : Prom
                             quantity: _product.quantity,
                             userId: userId
                         });
-                        await session.abortTransaction();
-                        session.endSession();
                         return resolve(true);
                     }
                 }
 
                 product.quantity -= _product.quantity;
-                await product.save({ session });
+                await product.save();
             }
-
-            await session.commitTransaction();
 
             logger.info(`publishing event: order.product.stock_updated for order ${orderId} for user ${userId}`);
             await publishEvent("orders-exchange", "order.product.stock_updated", { orderId, userId });
 
             logger.info(`processed event: order.placed for order ${orderId} for user ${userId} successfully`);
-            await session.endSession();
             return resolve(true);
         } catch (error) {
-            await session.abortTransaction();
-            session.endSession();
             logger.error(`Error in processing order ${message.orderId} for user ${message.userId}: ${error}`);
-            reject(error);
+            resolve(false);
         }
     });
 }
