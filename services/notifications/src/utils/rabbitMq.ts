@@ -43,7 +43,8 @@ export const connectToRabbitMq = async (exchanges: string[]) => {
             return;
         }
 
-        connection = await amqp.connect(getEnv("RABBITMQ_URL"));
+        connection = await retry(() => amqp.connect(getEnv("RABBITMQ_URL") as string), 5, 3000) as amqp.ChannelModel;
+
         channel = await connection.createChannel();
 
         for(const exchange of exchanges){
@@ -71,5 +72,20 @@ export const publishEvent = async (exchange: string, key: string, message: any) 
     } catch (error) {
         logger.error(`Error publishing event: ${key} ${error}`);
         throw error;
+    }
+}
+
+async function retry( fn: () => Promise<any> , maxAttempts: number , delay: 3000) {
+    let attempts = 0;
+    while (attempts < maxAttempts) {
+        try {
+            return await fn();
+        } catch (error) {
+            attempts++;
+            if(attempts >= maxAttempts){
+                throw error;
+            }
+            await new Promise((res , reject) => setTimeout(res , delay));
+        }
     }
 }

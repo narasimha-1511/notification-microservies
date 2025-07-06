@@ -21,7 +21,7 @@ interface orderStatusUpdatedMessage {
 
 //order.placed
 export const handleOrderPlacedEvent = async (message: orderPlacedMessage) : Promise<boolean> => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve, _reject) => {
         logger.info(`processing event: order.placed for order ${message.orderId} for user ${message.userId}`);
         try {
             const { orderId, userId, products } = message;
@@ -39,14 +39,14 @@ export const handleOrderPlacedEvent = async (message: orderPlacedMessage) : Prom
             return resolve(true);
         } catch (error) {
             logger.error(`error processing event: order.placed for order ${message.orderId} for user ${message.userId}`);
-            return reject(error);
+            return resolve(false)
         }
     });
 }
 
 //order.status_updated
 export const handleOrderStatusUpdatedEvent = async (message: orderStatusUpdatedMessage) : Promise<boolean> => {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve, _reject) => {
         logger.info(`processing event: order.status_updated for order ${message.orderId} for user ${message.userId}`);
         try {
             const { orderId, userId, status, reason } = message;
@@ -64,7 +64,7 @@ export const handleOrderStatusUpdatedEvent = async (message: orderStatusUpdatedM
             return resolve(true);
         } catch (error) {
             logger.error(`error processing event: order.status_updated for order ${message.orderId} for user ${message.userId}`);
-            return reject(error);
+            return resolve(false);
         }
     });
 }

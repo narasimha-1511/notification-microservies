@@ -96,10 +96,10 @@ const notificationResolvers: IResolvers = {
 
                 const cacheKey = `notifications:unread:${args.input?.userId}:${args.input?.page}:${args.input?.limit}`;
                 const cachedData = await redisClient.get(cacheKey);
-                // if(cachedData){
-                //     logger.info(`Returning cached data for unread notifications`);
-                //     return JSON.parse(cachedData);
-                // }
+                if(cachedData){
+                    logger.info(`Returning cached data for unread notifications`);
+                    return JSON.parse(cachedData);
+                }
 
                 const response = await axiosInstance.get(`/notifications`, {
                     baseURL: notificationServiceUrl,

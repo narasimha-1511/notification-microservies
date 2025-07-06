@@ -46,7 +46,7 @@ export const connectToRabbitMq = async (exchanges: string[]) => {
             throw new Error("RABBITMQ_URL is not set in environment variables");
         }
 
-        connection = await amqp.connect(process.env.RABBITMQ_URL as string);
+        connection = await retry(() => amqp.connect(process.env.RABBITMQ_URL as string) , 5 , 3000) as amqp.ChannelModel;
         channel = await connection.createChannel();
 
         for(const exchange of exchanges){
@@ -74,5 +74,20 @@ export const publishEvent = async (exchange: string, key: string, message: any) 
     } catch (error) {
         logger.error(`Error publishing event: ${key} ${error}`);
         throw error;
+    }
+}
+
+async function retry( fn: () => Promise<any> , maxAttempts: number , delay: number){
+    let attempts = 0;
+    while (attempts < maxAttempts){
+        try {
+            return await fn();            
+        } catch (error) {
+            attempts++;
+            if(attempts >= maxAttempts){
+                throw error;
+            }
+            await new Promise((res , reject) => setTimeout(res , delay))
+        }
     }
 }
