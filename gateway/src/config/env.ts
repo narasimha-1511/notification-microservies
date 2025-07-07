@@ -11,7 +11,8 @@ const envSchema = z.object({
     PRODUCT_SERVICE_URL: z.string().url(),
     ORDER_SERVICE_URL: z.string().url(),
     REDIS_URL: z.string().url(),
-    ADMIN_SECRET: z.string()
+    ADMIN_SECRET: z.string(),
+    GRAFANA_LOKI_HOST: z.string().url().optional(),
 });
 
 

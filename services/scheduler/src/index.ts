@@ -7,6 +7,16 @@ const main = async () => {
     try {
         await connectToRabbitMq(["notifications-exchange"]);
         await startScheduler();
+        logger.info("Scheduler started");
+        logger.error("Scheduler started");
+        logger.error("Scheduler started");
+        logger.error("Scheduler started");
+        logger.error("Scheduler started");
+        logger.error("Scheduler started");
+        logger.error("Scheduler started");
+        logger.error("Scheduler started");
+        logger.error("Scheduler started");
+        logger.error("Scheduler started");
     } catch (error) {
         logger.error(`Error starting scheduler: ${error}`);
         process.exit(1);

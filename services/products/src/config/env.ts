@@ -7,7 +7,8 @@ const envSchema = z.object({
     NODE_ENV: z.enum(['development','production']),
     MONGO_URI: z.string(),
     RABBITMQ_URL: z.string().url(),
-    ORDERS_SERVICE_URL: z.string().url()
+    ORDERS_SERVICE_URL: z.string().url(),
+    GRAFANA_LOKI_HOST: z.string().url().optional(),
 });
 
 

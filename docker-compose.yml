@@ -18,6 +18,13 @@ services:
     networks:
       - backend
 
+  loki:
+    image: grafana/loki
+    ports:
+      - "3100:3100"
+    networks:
+      - backend
+
   redis:
     image: redis:alpine
     ports:
@@ -95,6 +102,7 @@ services:
       - MONGO_URI=mongodb://user:pass@users-db:27017/users?authSource=admin
       - JWT_SECRET=secret
       - JWT_EXPIRY=1h
+      - GRAFANA_LOKI_HOST=http://loki:3100
     networks:
       - backend
 
@@ -110,6 +118,7 @@ services:
       - MONGO_URI=mongodb://user:pass@notifications-db:27017/notifications?authSource=admin
       - RABBITMQ_URL=amqp://rabbitmq:5672
       - USER_SERVICE_URL=http://users-service:3001
+      - GRAFANA_LOKI_HOST=http://loki:3100
     depends_on:
       - users-service
     networks:
@@ -127,6 +136,7 @@ services:
       - MONGO_URI=mongodb://user:pass@products-db:27017/products?authSource=admin
       - RABBITMQ_URL=amqp://rabbitmq:5672
       - ORDERS_SERVICE_URL=http://orders-service:3004
+      - GRAFANA_LOKI_HOST=http://loki:3100
     depends_on:
       - users-service
     networks:
@@ -144,6 +154,7 @@ services:
       - MONGO_URI=mongodb://user:pass@orders-db:27017/orders?authSource=admin
       - RABBITMQ_URL=amqp://rabbitmq:5672
       - PRODUCT_SERVICE_URL=http://products-service:3003
+      - GRAFANA_LOKI_HOST=http://loki:3100
     depends_on:
       - users-service
     networks:
@@ -158,6 +169,7 @@ services:
       - RABBITMQ_URL=amqp://rabbitmq:5672
       - PRODUCT_SERVICE_URL=http://products-service:3003
       - USER_SERVICE_URL=http://users-service:3001
+      - GRAFANA_LOKI_HOST=http://loki:3100
     depends_on:
       - users-service
       - products-service
@@ -181,6 +193,7 @@ services:
       - ORDER_SERVICE_URL=http://orders-service:3004
       - REDIS_URL=redis://redis:6379
       - ADMIN_SECRET=admin
+      - GRAFANA_LOKI_HOST=http://loki:3100
     depends_on:
       - users-service
       - notifications-service

@@ -8,6 +8,7 @@ const envSchema = z.object({
     JWT_SECRET: z.string(),
     JWT_EXPIRY: z.string(),
     MONGO_URI: z.string(),
+    GRAFANA_LOKI_HOST: z.string().url().optional(),
 });
 
 
