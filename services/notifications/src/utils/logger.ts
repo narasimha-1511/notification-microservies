@@ -3,7 +3,7 @@ import { getEnv } from "../config/env";
 import LokiTransport from "winston-loki";
 
 const logger = winston.createLogger({
-    level: getEnv('NODE_ENV') === "production" ? "info" : "debug",
+    level: getEnv('NODE_ENV') === "production" ? "http" : "debug",
     defaultMeta: {
         "service" : "notification-service"
     },

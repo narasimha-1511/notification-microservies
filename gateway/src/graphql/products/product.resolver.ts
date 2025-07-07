@@ -86,6 +86,7 @@ const productResolvers: IResolvers = {
                 const adminKey = context.headers["x-admin-key"];
 
                 if(adminKey !== getEnv("ADMIN_SECRET") || !adminKey){
+                    logger.warn(`Unauthorized request to add product`);
                     return {
                         success: false,
                         message: "Unauthorized"
