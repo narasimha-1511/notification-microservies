@@ -21,4 +21,4 @@ if(!parsedEnv.success){
 type Env = z.infer<typeof envSchema>;
 const env: Env = parsedEnv.data;
 
-export const getEnv = (key: keyof Env) => env[key]; 
+export const getEnv = <K extends keyof Env>(key: K): Env[K] => env[key]; 

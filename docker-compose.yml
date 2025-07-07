@@ -98,7 +98,7 @@ services:
       - "3001:3001"
     environment:
       - PORT=3001
-      - NODE_ENV=development
+      - NODE_ENV=production
       - MONGO_URI=mongodb://user:pass@users-db:27017/users?authSource=admin
       - JWT_SECRET=secret
       - JWT_EXPIRY=1h
@@ -114,7 +114,7 @@ services:
       - "3002:3002"
     environment:
       - PORT=3002
-      - NODE_ENV=development
+      - NODE_ENV=production
       - MONGO_URI=mongodb://user:pass@notifications-db:27017/notifications?authSource=admin
       - RABBITMQ_URL=amqp://rabbitmq:5672
       - USER_SERVICE_URL=http://users-service:3001
@@ -132,7 +132,7 @@ services:
       - "3003:3003"
     environment:
       - PORT=3003
-      - NODE_ENV=development
+      - NODE_ENV=production
       - MONGO_URI=mongodb://user:pass@products-db:27017/products?authSource=admin
       - RABBITMQ_URL=amqp://rabbitmq:5672
       - ORDERS_SERVICE_URL=http://orders-service:3004
@@ -150,7 +150,7 @@ services:
       - "3004:3004"
     environment:
       - PORT=3004
-      - NODE_ENV=development
+      - NODE_ENV=production
       - MONGO_URI=mongodb://user:pass@orders-db:27017/orders?authSource=admin
       - RABBITMQ_URL=amqp://rabbitmq:5672
       - PRODUCT_SERVICE_URL=http://products-service:3003
@@ -165,7 +165,7 @@ services:
       context: ./services/scheduler
       dockerfile: Dockerfile
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - RABBITMQ_URL=amqp://rabbitmq:5672
       - PRODUCT_SERVICE_URL=http://products-service:3003
       - USER_SERVICE_URL=http://users-service:3001
@@ -185,7 +185,7 @@ services:
       - "8000:8000"
     environment:
       - PORT=8000
-      - NODE_ENV=development
+      - NODE_ENV=production
       - JWT_SECRET=secret
       - USER_SERVICE_URL=http://users-service:3001
       - NOTIFICATION_SERVICE_URL=http://notifications-service:3002
